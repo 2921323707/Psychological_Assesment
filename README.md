@@ -138,6 +138,19 @@ Body: {
 
 详细量表列表和资源链接请参考 [ScaleSrc.md](ScaleSrc.md)
 
+## Git使用指南
+
+详细的Git操作和仓库更新指南请参考 [GIT_GUIDE.md](GIT_GUIDE.md)
+
+**快速更新仓库**:
+```bash
+# 使用Python脚本（推荐）
+python update_github.py
+
+# 或在Windows上使用批处理
+update_github.bat
+```
+
 ## 开发计划
 
 - [ ] 用户注册登录系统
