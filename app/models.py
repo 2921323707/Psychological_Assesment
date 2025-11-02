@@ -62,16 +62,21 @@ class ScaleItem(db.Model):
     scale_id = db.Column(db.Integer, db.ForeignKey('scales.id'), nullable=False)
     question = db.Column(db.Text, nullable=False)
     item_type = db.Column(db.String(20), default='multiple_choice')  # multiple_choice, likert
+    options = db.Column(db.Text)  # JSON格式存储选项，格式: [{"text": "选项文字", "value": 分数}]
+    reverse_scoring = db.Column(db.Boolean, default=False)  # 是否反向计分
     order = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def to_dict(self):
         """转换为字典"""
+        import json
         return {
             'id': self.id,
             'scale_id': self.scale_id,
             'question': self.question,
             'item_type': self.item_type,
+            'options': json.loads(self.options) if self.options else [],
+            'reverse_scoring': self.reverse_scoring,
             'order': self.order
         }
 
@@ -86,6 +91,7 @@ class Test(db.Model):
     score = db.Column(db.Float)
     result_level = db.Column(db.String(50))  # 轻度、中度、重度等
     answers = db.Column(db.Text)  # JSON格式存储答案
+    duration = db.Column(db.Integer, default=0)  # 测试时长（秒）
     completed_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def to_dict(self):
@@ -96,6 +102,7 @@ class Test(db.Model):
             'scale_id': self.scale_id,
             'score': self.score,
             'result_level': self.result_level,
+            'duration': self.duration or 0,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None
         }
 

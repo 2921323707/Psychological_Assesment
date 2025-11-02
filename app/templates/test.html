@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+
+{% block title %}心理测评 - {{ scale_name }}{% endblock %}
+
+{% block content %}
+<div class="test-container">
+    <!-- 测评说明页 -->
+    <div id="test-intro" class="test-intro">
+        <div class="container">
+            <div class="intro-card">
+                <h2 id="scale-name">加载中...</h2>
+                <div id="scale-description" class="scale-description"></div>
+                <div class="instruction-box">
+                    <h3>测评说明</h3>
+                    <p id="scale-instruction">请根据最近一周的情况，选择最符合您的选项</p>
+                    <ul class="instruction-list">
+                        <li>本测评约需要 <span id="estimated-time">5</span> 分钟完成</li>
+                        <li>请认真阅读每一道题目，选择最符合您情况的选项</li>
+                        <li>测评结果仅供参考，不能替代专业诊断</li>
+                        <li>您的答案将被严格保密</li>
+                    </ul>
+                </div>
+                <button class="btn btn-primary btn-large" onclick="startTest()">开始测评</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 测评页面 -->
+    <div id="test-page" class="test-page" style="display: none;">
+        <div class="container">
+            <!-- 进度条 -->
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span class="progress-text">题目 <span id="current-question-num">1</span> / <span id="total-questions">20</span></span>
+                    <span class="progress-percent" id="progress-percent">5%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- 题目卡片 -->
+            <div class="question-card">
+                <div class="question-number">第 <span id="question-number">1</span> 题</div>
+                <h3 class="question-text" id="question-text">加载题目中...</h3>
+                
+                <div class="options-list" id="options-list">
+                    <!-- 选项将动态插入 -->
+                </div>
+
+                <!-- 导航按钮 -->
+                <div class="question-nav">
+                    <button class="btn btn-secondary" id="prev-btn" onclick="previousQuestion()" disabled>上一题</button>
+                    <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()">下一题</button>
+                    <button class="btn btn-success" id="submit-btn" onclick="submitTest()" style="display: none;">提交答案</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提交确认对话框 -->
+    <div id="submit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>确认提交</h3>
+            <p>您还有 <span id="unanswered-count">0</span> 道题目未作答，确定要提交吗？</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSubmitModal()">返回继续</button>
+                <button class="btn btn-primary" onclick="confirmSubmit()">确认提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+/* 测评页面样式 */
+.test-container {
+    min-height: calc(100vh - 200px);
+}
+
+/* 测评说明页 */
+.test-intro {
+    padding: 3rem 0;
+}
+
+.intro-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 3rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.intro-card h2 {
+    color: #667eea;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+}
+
+.scale-description {
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+    text-align: left;
+}
+
+.instruction-box {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 10px;
+    margin: 2rem 0;
+    text-align: left;
+}
+
+.instruction-box h3 {
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.instruction-list {
+    list-style: none;
+    padding: 0;
+}
+
+.instruction-list li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.instruction-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.btn-large {
+    padding: 1rem 3rem;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+
+/* 测评页面 */
+.test-page {
+    padding: 2rem 0;
+}
+
+.progress-section {
+    margin-bottom: 2rem;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.progress-text {
+    color: #667eea;
+}
+
+.progress-percent {
+    color: #666;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.question-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
+
+.question-number {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.question-text {
+    color: #333;
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+}
+
+.options-list {
+    margin-bottom: 2rem;
+}
+
+.option-item {
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+.option-item:hover {
+    background: #e9ecef;
+    border-color: #667eea;
+}
+
+.option-item.selected {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.option-item input[type="radio"] {
+    margin-right: 1rem;
+    cursor: pointer;
+}
+
+.option-item label {
+    cursor: pointer;
+    flex: 1;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.question-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-secondary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+/* 模态框 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+}
+
+.modal-content h3 {
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.modal-actions .btn {
+    flex: 1;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .intro-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .question-card {
+        padding: 1.5rem;
+    }
+    
+    .question-text {
+        font-size: 1.1rem;
+    }
+    
+    .question-nav {
+        flex-direction: column;
+    }
+    
+    .question-nav .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/test.js') }}"></script>
+<script>
+// 从URL获取量表ID
+const urlParams = new URLSearchParams(window.location.search);
+const scaleId = urlParams.get('id') || urlParams.get('scale_id');
+
+if (scaleId) {
+    window.currentScaleId = scaleId;
+} else {
+    alert('缺少量表ID参数');
+    window.location.href = '/scales';
+}
+</script>
+{% endblock %}
+
