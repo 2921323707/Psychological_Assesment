@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 心理测评系统{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <h2>专业的心理测评平台</h2>
+        <p>提供60+种专业心理量表，涵盖情绪、人格、认知、性心理等多个领域</p>
+        <a href="{{ url_for('main.scales') }}" class="btn btn-primary">开始测评</a>
+    </div>
+</div>
+
+<div class="container">
+    <section class="features">
+        <h3>平台特点</h3>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h4>专业量表</h4>
+                <p>基于权威心理学量表，确保测评结果的科学性和准确性</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h4>隐私保护</h4>
+                <p>严格的数据加密和隐私保护机制，您的信息安全有保障</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h4>详细报告</h4>
+                <p>提供专业的测评报告和建议，帮助您更好地了解自己</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <h4>即时结果</h4>
+                <p>测试完成即刻获得结果，无需等待</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="categories">
+        <h3>测评分类</h3>
+        <div class="category-grid">
+            <div class="category-card">
+                <h4>情绪与心理健康</h4>
+                <p>SDS、SAS、SCL-90等</p>
+            </div>
+            <div class="category-card">
+                <h4>人格特质</h4>
+                <p>EPQ、16PF、MMPI、MBTI等</p>
+            </div>
+            <div class="category-card">
+                <h4>认知与记忆</h4>
+                <p>智力测验、推理能力等</p>
+            </div>
+            <div class="category-card">
+                <h4>性心理与性健康</h4>
+                <p>性压抑指数、性满意度等</p>
+            </div>
+            <div class="category-card">
+                <h4>职业与兴趣</h4>
+                <p>霍兰德职业兴趣测验等</p>
+            </div>
+            <div class="category-card">
+                <h4>其他专门量表</h4>
+                <p>情绪智商、心理弹性等</p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+

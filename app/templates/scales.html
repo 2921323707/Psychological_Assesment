@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}量表列表 - 心理测评系统{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>心理测评量表</h2>
+    <div id="scales-list" class="scales-list">
+        <p class="loading">加载中...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/scales/list')
+        .then(response => response.json())
+        .then(data => {
+            if (data.code === 200) {
+                displayScales(data.data);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('scales-list').innerHTML = '<p class="error">加载失败，请稍后重试</p>';
+        });
+});
+
+function displayScales(scales) {
+    const container = document.getElementById('scales-list');
+    
+    if (scales.length === 0) {
+        container.innerHTML = '<p>暂无量表</p>';
+        return;
+    }
+    
+    const html = scales.map(scale => `
+        <div class="scale-card">
+            <h3>${scale.name}</h3>
+            <div class="scale-info">
+                <span class="badge">${scale.category}</span>
+                <span class="info">${scale.items}题 · 约${scale.time}分钟</span>
+            </div>
+            <button class="btn btn-primary" onclick="startTest(${scale.id})">开始测试</button>
+        </div>
+    `).join('');
+    
+    container.innerHTML = html;
+}
+
+function startTest(scaleId) {
+    alert('量表ID: ' + scaleId + ' - 功能开发中...');
+}
+</script>
+{% endblock %}
+
