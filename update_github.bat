@@ -1,32 +1,33 @@
 @echo off
-REM Git 更新仓库脚本 (Windows版本)
-REM 用于快速提交和推送代码到GitHub
+chcp 65001 >nul
+REM Git Update Script (Windows)
+REM Quick commit and push to GitHub
 
 echo ===============================================
-echo GitHub 仓库更新脚本
+echo GitHub Repository Update Script
 echo ===============================================
 echo.
 
-REM 检查git状态
-echo 1. 检查Git状态...
+REM Check git status
+echo 1. Checking Git status...
 git status
 
 echo.
-set /p confirm="是否继续更新? (y/n): "
+set /p confirm="Continue update? (y/n): "
 
 if /i not "%confirm%"=="y" (
-    echo 操作已取消
+    echo Operation cancelled
     exit /b 0
 )
 
-REM 添加所有更改
+REM Add all changes
 echo.
-echo 2. 添加所有更改...
+echo 2. Adding all changes...
 git add .
 
-REM 获取提交信息
+REM Get commit message
 echo.
-set /p commit_msg="请输入提交信息 (或按回车使用默认): "
+set /p commit_msg="Enter commit message (or press Enter for default): "
 
 if "%commit_msg%"=="" (
     for /f "tokens=1-3 delims=/ " %%a in ("%date%") do (set mydate=%%c-%%b-%%a)
@@ -34,23 +35,23 @@ if "%commit_msg%"=="" (
     set commit_msg=Update: %mydate% %mytime%
 )
 
-REM 提交更改
+REM Commit changes
 echo.
-echo 3. 提交更改...
-echo 提交信息: %commit_msg%
+echo 3. Committing changes...
+echo Commit message: %commit_msg%
 git commit -m "%commit_msg%"
 
-REM 推送到远程仓库
+REM Push to GitHub
 echo.
-echo 4. 推送到GitHub...
+echo 4. Pushing to GitHub...
 git push origin main
 
 echo.
 echo ===============================================
-echo ✅ 更新完成！
+echo Success: Update complete!
 echo ===============================================
 echo.
-echo 仓库地址: https://github.com/2921323707/Psychological_Assesment
+echo Repository: https://github.com/2921323707/Psychological_Assesment
 echo.
 
 pause
